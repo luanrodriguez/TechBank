@@ -1,6 +1,9 @@
 import { useState, useContext} from "react"
 
 import { authContext } from "../../contexts/Auth"
+import { BackgroundLogin, ContainerLogin, SectionLogin, FormButton, Title } from "./styles"
+import { TextField, Button } from "@mui/material"
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export function LoginPage() {
     const [email, setEmail] = useState('')
@@ -12,18 +15,21 @@ export function LoginPage() {
     }
 
     return(
-        <>
-            <form>
-                <label>Email:</label>
-                <input onChange={(e) => setEmail(e.target.value)}/>
+        <SectionLogin>
+            <ContainerLogin>
+                <AccountCircleIcon className="account-icon" color="primary"/>
 
-                <label>Senha:</label>
-                <input type='password' onChange={(e) => setPassword(e.target.value)}/>
+                <Title>Entrar</Title>
 
-                <button type='button' onClick={handleSubmitButtonClick}>Logar</button>
-            </form>
-            <a href='/register'>Registrar</a>
-        </>
+                <TextField className="textfield" label="Email" variant="outlined" onChange={(e) => setEmail(e.target.value)}/>
+
+                <TextField className="textfield" label="Senha" variant="outlined" type='password' onChange={(e) => setPassword(e.target.value)}/>
+
+                <FormButton type='button' onClick={handleSubmitButtonClick}>Entrar</FormButton>
+                <Button href='/register'>Registrar</Button>
+            </ContainerLogin>
+            <BackgroundLogin/>
+        </SectionLogin>
 
     )
 }
