@@ -23,7 +23,7 @@ export const ContainerLogin = styled.form`
     }
 
     .account-icon{
-        font-size: 10rem;
+        font-size: 5rem;
         margin-bottom: 0.5rem;
     }
 `;

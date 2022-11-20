@@ -1,7 +1,10 @@
 import axios from 'axios'
 import { useContext, useEffect, useState } from "react"
-
 import { authContext } from "../../contexts/Auth"
+import { ContainerBalance, ContainerAccount, ContainerHome, NavBar, Title, BalanceText, LogoutButton} from './styles'
+import { Button } from "@mui/material"
+import Paid from '@mui/icons-material/Paid'
+import Logout from '@mui/icons-material/Logout'
 
 export function HomePage() {
     const {user, logout} = useContext(authContext)
@@ -28,11 +31,17 @@ export function HomePage() {
     }, [user])
 
     return(
-        <>
-            <h1>Bem vindo, {user.username}!</h1>
-            <p>Seu saldo é {balance}</p>
-            <a href='/transactions'>Transferências</a>
-            <button onClick={handleLogoutClick}>Logout</button>
-        </>
+        <ContainerHome>
+            <ContainerAccount>
+                <Title>Bem vindo, {user.username}!</Title>  
+                <ContainerBalance> 
+                    <Paid color="primary" fontSize='large'/><BalanceText>{balance}</BalanceText>
+                </ContainerBalance>
+                <NavBar>
+                    <Button href='/transactions'>Transferências</Button>
+                    <LogoutButton onClick={handleLogoutClick}><Logout fontSize='small'/></LogoutButton>
+                </NavBar>
+            </ContainerAccount>
+        </ContainerHome>
     )
 }

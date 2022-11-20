@@ -1,7 +1,19 @@
 import axios from 'axios'
-import { isSameDay, parseISO } from 'date-fns'
+import { isSameDay, parseISO, format } from 'date-fns'
 import { useState, useEffect, useContext } from 'react'
 import { authContext } from '../../contexts/Auth'
+import { 
+    ButtonFilters,
+    ContainerAccount, 
+    ContainerTable, 
+    ContainerTransactions, 
+    CustomFilters, 
+    Filters,
+    Button, 
+    NavBar,
+    Title,
+    ContainerMakeTransfer
+} from './styles'
 
 interface transactionsType {
     debitedAccount: {
@@ -20,7 +32,6 @@ interface transactionsType {
 
 export function TransactionsPage(){
     const [date, setDate] = useState('')
-    const [radioButtonState, setRadioButtonState] = useState('')
     const [value, setValue] = useState(0)
     const [creditedUsername, setCreditedUsername] = useState('')
     const [notFilteredState, setNotFilteredState] = useState<transactionsType[]>([])
@@ -41,27 +52,16 @@ export function TransactionsPage(){
     function handleFilterButtonClick() {
         const parsedDate = parseISO(date)
 
-        if(radioButtonState === 'debited') {
-            setFilteredTransactions(notFilteredState.filter((transaction) => {
-                return(
-                    transaction.debitedAccount.user.username === user.username &&
-                    isSameDay(parseISO(transaction.createdAt), parsedDate)
+        setFilteredTransactions((state) => {
+            const filtrados = state.filter((transaction) => {
+                console.log(parsedDate)
+                console.log(parseISO(transaction.createdAt))
+                return (
+                    isSameDay(parsedDate, parseISO(transaction.createdAt))
                 )
-            }))
-        } else if(radioButtonState === 'credited') {
-            setFilteredTransactions(notFilteredState.filter((transaction) => {
-                return(
-                    transaction.creditedAccount.user.username === user.username &&
-                    isSameDay(parseISO(transaction.createdAt), parsedDate)
-                )         
-            }))
-        } else {
-            setFilteredTransactions(notFilteredState.filter((transaction) => {
-                return(
-                    isSameDay(parseISO(transaction.createdAt), parsedDate)
-                )
-            }))
-        }
+            })
+            return filtrados
+        })
     }
 
     function handleTransferButtonClick() {
@@ -102,40 +102,62 @@ export function TransactionsPage(){
     }, [user])
 
     return(
-        <>
-            <h1>Transactions</h1>
-            <a href='/'>Home</a>
-            <button onClick={handleReceivedButtonClick}>Recebidos</button>
-            <button onClick={handleSentButtonClick}>Enviados</button>
+        <ContainerTransactions>
+            <ContainerAccount>
+                <NavBar>
+                    <Title>Transferências</Title>
+                    <a href='/'>Home</a>
+                </NavBar>
 
-            
-            <label htmlFor="credited">Recebidos</label>
-            <input type="radio" id="credited" value="credited" name="transfer" onChange={(e) => setRadioButtonState(e.target.value)} />
-            <label htmlFor="debited">Enviados</label>
-            <input type="radio" id="debited" value="debited" name="transfer" onChange={(e) => setRadioButtonState(e.target.value)} />
-            <label htmlFor="both">Ambos</label> 
-            <input type="radio" id="both" value="both" name="transfer" onChange={(e) => setRadioButtonState(e.target.value)} />
-            <label htmlFor="date">Data</label>
-            <input type='date' id="date" onChange={(e) => setDate(e.target.value)} />
-            <button onClick={handleFilterButtonClick}>Filtrar</button>
+                <Filters>
+                    <ButtonFilters>
+                        <Button onClick={handleReceivedButtonClick}>Recebidos</Button>
+                        <Button onClick={handleSentButtonClick}>Enviados</Button>
+                        <Button onClick={()=>setFilteredTransactions(notFilteredState)}>Ambos</Button>
+                    </ButtonFilters>
 
-            {filteredTransactions.map(transactionInfo => {
-                return (
-                    <div>
-                        <p>{transactionInfo.creditedAccount.user.username}</p>
-                        <p>{transactionInfo.debitedAccount.user.username}</p>
-                        <p>{transactionInfo.value}</p>
-                        <p>{transactionInfo.createdAt}</p>
-                    </div>
-                )
-            })}
-            <form>
-                <label>Para quem quer transferir?</label>
-                <input onChange={(e) => setCreditedUsername(e.target.value)}/>
-                <label>Qual a quantia?</label>
-                <input type='number' onChange={(e) => setValue(Number(e.target.value))}/>
-                <button type='button' onClick={handleTransferButtonClick}>Enviar</button>
-            </form>
-        </>
+                    <CustomFilters>
+                        <label htmlFor="date">Data</label>
+                        <input type='date' id="date" onChange={(e) => setDate(e.target.value)} />
+                        <Button onClick={handleFilterButtonClick}>Filtrar</Button>
+                    </CustomFilters>
+                </Filters>
+
+                <ContainerTable>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Envio</th>
+                                <th>Recebimento</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredTransactions.map(transactionInfo => {
+                                return (
+                                    <tr>
+                                        <td>{transactionInfo.debitedAccount.user.username}</td>
+                                        <td>{transactionInfo.creditedAccount.user.username}</td>
+                                        <td>{transactionInfo.value}</td>
+                                        <td>{format(parseISO(transactionInfo.createdAt), 'dd/MM/yyyy')}</td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </ContainerTable>
+                
+                <ContainerMakeTransfer> 
+                    <label>Para quem quer transferir?</label>
+                    <input onChange={(e) => setCreditedUsername(e.target.value)}/>
+                    <br />
+                    <label>Qual a quantia?</label>
+                    <input type='number' onChange={(e) => setValue(Number(e.target.value))}/>
+                    <br />
+                    <Button type='button' onClick={handleTransferButtonClick}>Enviar</Button>
+                </ContainerMakeTransfer>
+            </ContainerAccount>
+        </ContainerTransactions>
     )
 }
